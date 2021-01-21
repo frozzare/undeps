@@ -1,12 +1,14 @@
+const fs = require('fs');
+const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
-const fs = require('fs');
 
 const cwd = process.cwd();
 const pkg = require(`${cwd}/package.json`);
 
 const config = {
   ...{
+    checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
     pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
     exclude: [],
     excludeFn: (dep) => true,
@@ -32,8 +34,8 @@ const hasBinaries = (p) => {
   return b ? !!Object.keys(b).length : false;
 };
 
-const deps = Object.keys(pkg.dependencies)
-  .concat(Object.keys(pkg.devDependencies))
+const deps = Object.keys(pkg.dependencies || {})
+  .concat(Object.keys(pkg.devDependencies || {}))
   .filter(config.excludeFn)
   .filter((p) => (config.types ? true : p.indexOf('@types/') === -1))
   .filter((p) => !config.exclude.includes(p))
@@ -66,7 +68,13 @@ const files = {
 const fileNames = Object.keys(files);
 
 const checkFiles = (dep) =>
-  !!fileNames.find((fileName) => files[fileName].indexOf(dep) !== -1);
+  !!fileNames.find((fileName) =>
+    config.checkFn(dep, {
+      name: path.basename(fileName),
+      path: fileName,
+      body: files[fileName],
+    })
+  );
 
 const diff = R.pipe(
   R.reduce(
