@@ -1,0 +1,23 @@
+{
+  "name": "undeps",
+  "version": "1.0.0",
+  "description": "Find unused dependencies",
+  "main": "index.js",
+  "bin": {
+    "undeps": "src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dependencies",
+    "unused",
+    "check"
+  ],
+  "author": "Fredrik Forsmo <fredrik.forsmo@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^7.1.6",
+    "ramda": "^0.27.1"
+  }
+}
