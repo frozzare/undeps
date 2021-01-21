@@ -9,10 +9,10 @@ const pkg = require(`${cwd}/package.json`);
 const config = {
   ...{
     checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
-    pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
     exclude: [],
     excludeFn: (dep) => true,
     files: [],
+    pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
     types: false,
   },
   ...(fs.existsSync(`${cwd}/undeps.config.js`)

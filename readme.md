@@ -6,10 +6,11 @@
 
 ```js
 module.exports = {
-  pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
+  checkFn: (dep, file) => file.body.indexOf(dep) !== -1, // dep = e.g webpack, file = { name, path, body }
   exclude: [],
-  excludeFn: (dep) => true,
+  excludeFn: (dep) => true, // dep = e.g webpack,
   files: [],
+  pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
   types: false,
 };
 ```
