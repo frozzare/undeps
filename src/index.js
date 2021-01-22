@@ -2,12 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
-
 const cwd = process.cwd();
+
+if (!fs.existsSync(`${cwd}/package.json`)) {
+  console.error('No package.json exists in current folder');
+  return;
+}
+
 const pkg = require(`${cwd}/package.json`);
 
 const config = {
   ...{
+    binaries: false,
     checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
     exclude: [],
     excludeFn: (dep) => true,
@@ -20,7 +26,7 @@ const config = {
     : {}),
 };
 
-const binaries = (p) => {
+const findBinaries = (p) => {
   try {
     const { bin } = require(`${cwd}/node_modules/${p}/package.json`);
     return typeof bin === 'string' ? { [p]: [bin] } : bin;
@@ -30,7 +36,7 @@ const binaries = (p) => {
 };
 
 const hasBinaries = (p) => {
-  const b = binaries(p);
+  const b = findBinaries(p);
   return b ? !!Object.keys(b).length : false;
 };
 
@@ -39,7 +45,7 @@ const deps = Object.keys(pkg.dependencies || {})
   .filter(config.excludeFn)
   .filter((p) => (config.types ? true : p.indexOf('@types/') === -1))
   .filter((p) => !config.exclude.includes(p))
-  .filter((p) => !hasBinaries(p));
+  .filter((p) => (config.binaries ? true : !hasBinaries(p)));
 
 const files = {
   './package.json': JSON.stringify({
