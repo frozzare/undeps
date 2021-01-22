@@ -2,8 +2,9 @@
   "name": "undeps",
   "version": "1.0.0",
   "description": "Find unused dependencies",
+  "main": "src/index.js",
   "bin": {
-    "undeps": "src/index.js"
+    "undeps": "bin/undeps"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
