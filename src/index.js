@@ -85,7 +85,7 @@ function undeps(cwd) {
       })
     );
 
-  const diff = R.pipe(
+  const unused = R.pipe(
     R.reduce(
       (prev, dep) => ({
         ...prev,
@@ -97,8 +97,8 @@ function undeps(cwd) {
   )(deps);
 
   return {
-    deps,
-    diff,
+    used: deps,
+    unused,
   };
 }
 

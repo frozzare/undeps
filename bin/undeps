@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 const cwd = process.cwd();
-const { deps, diff } = require("../")(cwd);
+const { used, unused } = require("../")(cwd);
 
 console.log(
-  `Found ${Object.keys(deps).length} dependenc${
-    Object.keys(deps).length > 1 ? "ies" : "y"
-  } and ${Object.keys(diff).length} are unused:`
+  `Found ${Object.keys(used).length} dependenc${
+    Object.keys(used).length > 1 ? "ies" : "y"
+  } and ${Object.keys(unused).length} are unused:`
 );
-console.log(`\n${Object.keys(diff).join("\n")}`);
+console.log(`\n${Object.keys(unused).join("\n")}`);
