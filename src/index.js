@@ -40,12 +40,15 @@ const hasBinaries = (p) => {
   return b ? !!Object.keys(b).length : false;
 };
 
-const deps = Object.keys(pkg.dependencies || {})
-  .concat(Object.keys(pkg.devDependencies || {}))
-  .filter(config.excludeFn)
-  .filter((p) => (config.types ? true : p.indexOf('@types/') === -1))
-  .filter((p) => !config.exclude.includes(p))
-  .filter((p) => (config.binaries ? true : !hasBinaries(p)));
+const deps = R.pipe(
+  R.filter(config.excludeFn),
+  R.filter((p) => (config.types ? true : p.indexOf('@types/') === -1)),
+  R.filter((p) => !config.exclude.includes(p)),
+  R.filter((p) => (config.binaries ? true : !hasBinaries(p)))
+)([
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.devDependencies || {}),
+]);
 
 const files = {
   './package.json': JSON.stringify({
