@@ -29,6 +29,7 @@ module.exports = {
   excludeFn: (dep) => true, // dep = e.g webpack,
   files: [], // path to files to include, e.g ./babel.config.js
   pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
+  package: (cwd) => `${cwd}/package.json`, // object or string
   types: false, // set to true to check for @types/* deps, default is to ignore
 };
 ```
