@@ -1,7 +1,40 @@
 #!/usr/bin/env node
 
-const cwd = process.cwd();
-const { used, unused } = require("../")(cwd);
+const pcwd = process.cwd();
+const path = require("path");
+const argv = require("minimist")(process.argv.slice(2));
+const cwd = argv.cwd ? path.resolve(argv.cwd) : pcwd;
+const pkg = require("../package.json");
+const undeps = require("../");
+
+const help = `Usage: ${pkg.name} [options]
+
+${pkg.description}
+
+Options
+  -c, --config      path to undeps config file (default: ${pcwd}/undeps.config.js)
+  --cwd <cwd>       working directory to use (default: ${pcwd})
+  -v, --version     output the version number
+  -h, --help        output usage information`;
+
+if (argv.h || argv.help) {
+  console.log(help);
+  return;
+}
+
+if (argv.v || argv.version) {
+  console.log(pkg.version);
+  return;
+}
+
+const { used, unused } = undeps({
+  config: argv.config ? argv.config : `${cwd}/undeps.config.js`,
+  cwd,
+});
+
+if (!used) {
+  return;
+}
 
 console.log(
   `Found ${Object.keys(used).length} dependenc${

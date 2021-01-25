@@ -3,28 +3,34 @@ const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
 
-function undeps(cwd) {
-  if (!fs.existsSync(`${cwd}/package.json`)) {
-    console.error('No package.json exists in current folder');
-    return;
-  }
+const defaultConfig = {
+  binaries: false,
+  checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
+  exclude: [],
+  excludeFn: (dep) => true,
+  files: [],
+  pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
+  package: (cwd) => `${cwd}/package.json`, // object or string
+  types: false,
+};
 
-  const pkg = require(`${cwd}/package.json`);
+function undeps(opts) {
+  const { cwd } = opts;
 
   const config = {
-    ...{
-      binaries: false,
-      checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
-      exclude: [],
-      excludeFn: (dep) => true,
-      files: [],
-      pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
-      types: false,
-    },
-    ...(fs.existsSync(`${cwd}/undeps.config.js`)
-      ? require(`${cwd}/undeps.config.js`)
-      : {}),
+    ...defaultConfig,
+    ...(fs.existsSync(opts.config) ? require(opts.config) : {}),
   };
+
+  let pkg = config.package(cwd);
+  if (typeof pkg !== 'object' || Array.isArray(pkg)) {
+    try {
+      pkg = require(pkg);
+    } catch (err) {
+      console.error(`No package.json found in: ${cwd}`);
+      return;
+    }
+  }
 
   const findBinaries = (p) => {
     try {
@@ -102,4 +108,8 @@ function undeps(cwd) {
   };
 }
 
-module.exports = undeps;
+module.exports = (cwd) =>
+  undeps(cwd) || {
+    unused: 0,
+    used: 0,
+  };
