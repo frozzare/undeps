@@ -3,58 +3,66 @@ const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
 
-const defaultConfig = {
+const defaultPackage = {
+  dependencies: {},
+  devDependencies: {},
+  scripts: {},
+  resolutions: {},
+};
+
+const defaultConfig = (cwd) => ({
   binaries: false,
   checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
   exclude: [],
   excludeFn: (dep) => true,
   files: [],
-  pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
-  package: (cwd) => `${cwd}/package.json`, // object or string
+  pattern: `${cwd}/src/**/*.+(js|ts|jsx|tsx|vue)`,
+  package: `${cwd}/package.json`, // object or string
   types: false,
+});
+
+const findBinaries = (p) => {
+  try {
+    const { bin } = require(`${cwd}/node_modules/${p}/package.json`);
+    return typeof bin === 'string' ? { [p]: [bin] } : bin;
+  } catch (err) {}
 };
 
-function undeps(opts) {
-  const { cwd } = opts;
+const hasBinaries = (p) => {
+  const b = findBinaries(p);
+  return b ? !!Object.keys(b).length : false;
+};
 
-  const config = {
-    ...defaultConfig,
-    ...(fs.existsSync(opts.config) ? require(opts.config) : {}),
-  };
-
-  let pkg = config.package(cwd);
+const loadPackage = (pkg) => {
   if (typeof pkg !== 'object' || Array.isArray(pkg)) {
-    try {
-      pkg = require(pkg);
-    } catch (err) {
-      console.error(`No package.json found in: ${cwd}`);
-      return;
-    }
+    pkg = require(pkg);
   }
 
-  const findBinaries = (p) => {
-    try {
-      const { bin } = require(`${cwd}/node_modules/${p}/package.json`);
-      return typeof bin === 'string' ? { [p]: [bin] } : bin;
-    } catch (err) {
-      return;
-    }
+  return { ...defaultPackage, ...pkg };
+};
+
+const undeps = (config = {}, cwd = '') => {
+  cwd = cwd || process.cwd();
+
+  config = {
+    ...defaultConfig(cwd),
+    ...config,
   };
 
-  const hasBinaries = (p) => {
-    const b = findBinaries(p);
-    return b ? !!Object.keys(b).length : false;
-  };
+  let pkg;
+  try {
+    pkg = loadPackage(config.package);
+  } catch (err) {
+    console.error(`No package.json found in: ${cwd}`);
+    return;
+  }
 
   const deps = R.pipe(
     R.filter(config.excludeFn),
     R.filter((p) => (config.types ? true : p.indexOf('@types/') === -1)),
     R.filter((p) => !config.exclude.includes(p)),
     R.filter((p) => (config.binaries ? true : !hasBinaries(p)))
-  )([
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.devDependencies || {}),
-  ]);
+  )([...Object.keys(pkg.dependencies), ...Object.keys(pkg.devDependencies)]);
 
   const files = {
     './package.json': JSON.stringify({
@@ -99,17 +107,18 @@ function undeps(opts) {
       }),
       {}
     ),
-    R.filter((p) => !p)
+    R.filter((p) => !p),
+    R.keys
   )(deps);
 
   return {
-    used: deps,
+    deps,
     unused,
   };
-}
+};
 
-module.exports = (cwd) =>
-  undeps(cwd) || {
-    unused: 0,
-    used: 0,
+module.exports = (config, cwd) =>
+  undeps(config, cwd) || {
+    deps: [],
+    unused: [],
   };

@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
-const pcwd = process.cwd();
+const fs = require("fs");
 const path = require("path");
 const argv = require("minimist")(process.argv.slice(2));
-const cwd = argv.cwd ? path.resolve(argv.cwd) : pcwd;
 const pkg = require("../package.json");
 const undeps = require("../");
+
+const pcwd = process.cwd();
+const cwd = argv.cwd ? path.resolve(argv.cwd) : pcwd;
 
 const help = `Usage: ${pkg.name} [options]
 
@@ -27,18 +29,17 @@ if (argv.v || argv.version) {
   return;
 }
 
-const { used, unused } = undeps({
-  config: argv.config ? argv.config : `${cwd}/undeps.config.js`,
-  cwd,
-});
-
-if (!used) {
-  return;
-}
+const config = argv.config ? argv.config : `${cwd}/undeps.config.js`;
+const { deps, unused } = undeps(
+  {
+    ...(fs.existsSync(config) ? require(config) : {}),
+  },
+  cwd
+);
 
 console.log(
-  `Found ${Object.keys(used).length} dependenc${
-    Object.keys(used).length > 1 ? "ies" : "y"
+  `Found ${Object.keys(deps).length} dependenc${
+    Object.keys(deps).length > 1 ? "ies" : "y"
   } and ${Object.keys(unused).length} are unused:`
 );
 console.log(`\n${Object.keys(unused).join("\n")}`);

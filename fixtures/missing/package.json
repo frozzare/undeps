@@ -1,0 +1,7 @@
+{
+  "name": "missing",
+  "private": true,
+  "dependencies": {
+    "undeps": "*"
+  }
+}

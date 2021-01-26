@@ -7,6 +7,7 @@
     "undeps": "bin/undeps"
   },
   "scripts": {
+    "lint": "standardx src",
     "test": "jest"
   },
   "keywords": [
@@ -22,6 +23,7 @@
     "ramda": "^0.27.1"
   },
   "devDependencies": {
-    "jest": "^26.6.3"
+    "jest": "^26.6.3",
+    "standardx": "^7.0.0"
   }
 }

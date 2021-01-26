@@ -21,6 +21,8 @@ npm install -g undeps
 
 Filename: `undeps.config.js`
 
+Default config:
+
 ```js
 module.exports = {
   binaries: false, // set to true to include binaries dependencies in the search, default is to ignore
@@ -28,8 +30,8 @@ module.exports = {
   exclude: [], // deps to exclude, e.g webpack
   excludeFn: (dep) => true, // dep = e.g webpack,
   files: [], // path to files to include, e.g ./babel.config.js
-  pattern: './src/**/*.+(js|ts|jsx|tsx|vue)',
-  package: (cwd) => `${cwd}/package.json`, // object or string
+  pattern: `${cwd}/src/**/*.+(js|ts|jsx|tsx|vue)`,
+  package: `${cwd}/package.json`, // object or string
   types: false, // set to true to check for @types/* deps, default is to ignore
 };
 ```
