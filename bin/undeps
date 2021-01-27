@@ -38,8 +38,8 @@ const { deps, unused } = undeps(
 );
 
 console.log(
-  `Found ${Object.keys(deps).length} dependenc${
-    Object.keys(deps).length > 1 ? "ies" : "y"
-  } and ${Object.keys(unused).length} are unused:`
+  `Found ${deps.length} dependenc${deps.length > 1 ? "ies" : "y"} and ${
+    unused.length
+  } are unused:`
 );
-console.log(`\n${Object.keys(unused).join("\n")}`);
+console.log(`\n${unused.join("\n")}`);
