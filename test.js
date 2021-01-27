@@ -18,3 +18,13 @@ test('should find missing dependencies with default config', () => {
   expect(deps.length).toBe(unused.length);
   expect(unused).toStrictEqual(['undeps']);
 });
+
+test('should exclude binaries', () => {
+  const { deps, unused } = undeps(
+    {},
+    path.join(process.cwd(), 'fixtures', 'binaries')
+  );
+
+  expect(deps.length).toBe(0);
+  expect(unused.length).toBe(0);
+});

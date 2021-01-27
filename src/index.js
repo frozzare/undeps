@@ -21,15 +21,15 @@ const defaultConfig = (cwd) => ({
   types: false,
 });
 
-const findBinaries = (p) => {
+const findBinaries = (cwd, p) => {
   try {
     const { bin } = require(`${cwd}/node_modules/${p}/package.json`);
     return typeof bin === 'string' ? { [p]: [bin] } : bin;
   } catch (err) {}
 };
 
-const hasBinaries = (p) => {
-  const b = findBinaries(p);
+const hasBinaries = (cwd, p) => {
+  const b = findBinaries(cwd, p);
   return b ? !!Object.keys(b).length : false;
 };
 
@@ -61,7 +61,7 @@ const undeps = (config = {}, cwd = '') => {
     R.filter(config.excludeFn),
     R.filter((p) => (config.types ? true : p.indexOf('@types/') === -1)),
     R.filter((p) => !config.exclude.includes(p)),
-    R.filter((p) => (config.binaries ? true : !hasBinaries(p)))
+    R.filter((p) => (config.binaries ? true : !hasBinaries(cwd, p)))
   )([...Object.keys(pkg.dependencies), ...Object.keys(pkg.devDependencies)]);
 
   const files = {

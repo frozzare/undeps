@@ -1,6 +1,6 @@
 {
   "name": "undeps",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Find unused dependencies",
   "main": "src/index.js",
   "bin": {
