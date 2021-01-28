@@ -2,48 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
+const { defaultConfig } = require('./config');
+const { hasBinaries, loadPackage } = require('./package');
 
-const defaultPackage = {
-  dependencies: {},
-  devDependencies: {},
-  scripts: {},
-  resolutions: {},
-};
-
-const defaultConfig = (cwd) => ({
-  binaries: false,
-  checkFn: (dep, file) => file.body.indexOf(dep) !== -1,
-  exclude: [],
-  excludeFn: (dep) => true,
-  files: [],
-  pattern: `${cwd}/src/**/*.+(js|ts|jsx|tsx|vue)`,
-  package: `${cwd}/package.json`, // object or string
-  types: false,
-});
-
-const findBinaries = (cwd, p) => {
-  try {
-    const { bin } = require(`${cwd}/node_modules/${p}/package.json`);
-    return typeof bin === 'string' ? { [p]: [bin] } : bin;
-  } catch (err) {}
-};
-
-const hasBinaries = (cwd, p) => {
-  const b = findBinaries(cwd, p);
-  return b ? !!Object.keys(b).length : false;
-};
-
-const loadPackage = (pkg) => {
-  if (typeof pkg !== 'object' || Array.isArray(pkg)) {
-    pkg = require(pkg);
-  }
-
-  return { ...defaultPackage, ...pkg };
-};
-
-const undeps = (config = {}, cwd = '') => {
-  cwd = cwd || process.cwd();
-
+const undeps = (config = {}, cwd = process.cwd()) => {
   config = {
     ...defaultConfig(cwd),
     ...config,
@@ -61,7 +23,7 @@ const undeps = (config = {}, cwd = '') => {
     R.filter(config.excludeFn),
     R.filter((p) => (config.types ? true : p.indexOf('@types/') === -1)),
     R.filter((p) => !config.exclude.includes(p)),
-    R.filter((p) => (config.binaries ? true : !hasBinaries(cwd, p)))
+    R.filter((p) => (config.binaries ? true : !hasBinaries(p, cwd)))
   )([...Object.keys(pkg.dependencies), ...Object.keys(pkg.devDependencies)]);
 
   const files = {

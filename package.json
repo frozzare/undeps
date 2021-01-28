@@ -18,6 +18,7 @@
   "author": "Fredrik Forsmo <fredrik.forsmo@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.0",
     "glob": "^7.1.6",
     "minimist": "^1.2.5",
     "ramda": "^0.27.1"

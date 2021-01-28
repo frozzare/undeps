@@ -13,3 +13,6 @@ trim_trailing_whitespace = false
 
 [*.{md,js,jsx,ts,tsx,vue}]
 quote_type = single
+
+[bin/*]
+quote_type = single
