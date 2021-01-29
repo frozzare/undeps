@@ -1,17 +1,31 @@
+const { glob } = require('glob');
+
 const defaultPackage = {
   dependencies: {},
   devDependencies: {},
   scripts: {},
-  resolutions: {},
 };
 
-const loadPackage = (pkg) => {
-  if (typeof pkg !== 'object' || Array.isArray(pkg)) {
-    pkg = require(pkg);
-  }
+const loadPackage = (file) => ({ ...defaultPackage, ...require(file) });
 
-  return { ...defaultPackage, ...pkg };
-};
+const loadPackages = (pattern) =>
+  glob.sync(pattern).reduce((prev, file) => {
+    const pkg = loadPackage(file);
+    return {
+      dependencies: {
+        ...prev.dependencies,
+        ...pkg.dependencies,
+      },
+      devDependencies: {
+        ...prev.devDependencies,
+        ...pkg.devDependencies,
+      },
+      scripts: {
+        ...prev.scripts,
+        ...pkg.scripts,
+      },
+    };
+  }, {});
 
 const findBinaries = (p, cwd = process.cwd()) => {
   try {
@@ -29,4 +43,5 @@ module.exports = {
   findBinaries,
   hasBinaries,
   loadPackage,
+  loadPackages,
 };

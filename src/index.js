@@ -3,7 +3,7 @@ const path = require('path');
 const R = require('ramda');
 const glob = require('glob');
 const { defaultConfig } = require('./config');
-const { hasBinaries, loadPackage } = require('./package');
+const { hasBinaries, loadPackages } = require('./package');
 
 const undeps = (config = {}, cwd = process.cwd()) => {
   config = {
@@ -13,7 +13,7 @@ const undeps = (config = {}, cwd = process.cwd()) => {
 
   let pkg;
   try {
-    pkg = loadPackage(config.package);
+    pkg = loadPackages(config.packages);
   } catch (err) {
     console.error(`No package.json found in: ${cwd}`);
     return;
@@ -32,7 +32,6 @@ const undeps = (config = {}, cwd = process.cwd()) => {
       scripts: Object.values(pkg.scripts),
       dependencies: {},
       devDependencies: {},
-      resolutions: {},
     }),
     ...config.files.reduce(
       (prev, file) => ({
