@@ -15,6 +15,10 @@
     "unused",
     "check"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/frozzare/undeps.git"
+  },
   "author": "Fredrik Forsmo <fredrik.forsmo@gmail.com>",
   "license": "MIT",
   "dependencies": {
