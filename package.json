@@ -1,6 +1,6 @@
 {
   "name": "undeps",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Find unused dependencies",
   "main": "src/index.js",
   "bin": {
@@ -32,6 +32,6 @@
     "standardx": "^7.0.0"
   },
   "files": [
-    "src/index.js"
+    "src/"
   ]
 }
