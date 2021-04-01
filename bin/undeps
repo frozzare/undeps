@@ -1,3 +1,57 @@
 #!/usr/bin/env node
 
-require('../src/cli');
+const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
+const argv = require('minimist')(process.argv.slice(2));
+const pkg = require('../package.json');
+const undeps = require('../src');
+
+const pcwd = process.cwd();
+const cwd = argv.cwd ? path.resolve(argv.cwd) : pcwd;
+
+const help = `Usage: ${pkg.name} [options]
+
+${pkg.description}
+
+Options
+  --config          path to undeps config file (default: ${pcwd}/undeps.config.js)
+  --cwd <cwd>       working directory to use (default: ${pcwd})
+  --rm              uninstall unused dependencies (default: false)
+  -v, --version     output the version number
+  -h, --help        output usage information`;
+
+if (argv.h || argv.help) {
+  console.log(help);
+  return;
+}
+
+if (argv.v || argv.version) {
+  console.log(pkg.version);
+  return;
+}
+
+const config = argv.config ? argv.config : `${cwd}/undeps.config.js`;
+const { deps, unused } = undeps(
+  {
+    ...(fs.existsSync(config) ? require(config) : {}),
+  },
+  cwd
+);
+
+console.log(
+  chalk.green(
+    `Found ${deps.length} dependenc${deps.length > 1 ? 'ies' : 'y'} and ${
+      unused.length
+    } are unused:`
+  )
+);
+console.log(`\n${unused.join('\n')}`);
+
+if (argv.rm) {
+  const { exec, hasYarn } = require('./utils');
+  const tool = hasYarn(cwd) ? 'yarn remove -W' : 'npm uninstall';
+  const cmd = `${tool} ${unused.join(' ')}`;
+  console.log(`\n${chalk.blue('Running:')} ${cmd}\n`);
+  exec(cmd, cwd);
+}
