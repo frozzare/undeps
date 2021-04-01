@@ -3,7 +3,7 @@ const undeps = require('./');
 
 test('should not find any unused dependencies', () => {
   const { unused } = undeps({
-    exclude: ['minimist'],
+    exclude: ['minimist', 'chalk'],
   });
 
   expect(Object.keys(unused).length).toBe(0);
