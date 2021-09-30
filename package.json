@@ -22,13 +22,13 @@
   "author": "Fredrik Forsmo <fredrik.forsmo@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^4.1.1",
-    "glob": "^7.1.7",
+    "chalk": "^4.1.2",
+    "glob": "^7.2.0",
     "minimist": "^1.2.5",
     "ramda": "^0.27.1"
   },
   "devDependencies": {
-    "jest": "^27.0.4",
+    "jest": "^27.2.4",
     "standardx": "^7.0.0"
   },
   "files": [
